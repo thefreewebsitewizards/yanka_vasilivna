@@ -8,7 +8,7 @@ hamburger.addEventListener('click', () => {
 });
 
 // Close mobile menu when clicking on a link
-document.querySelectorAll('.nav-link').forEach(link => {
+document.querySelectorAll('.nav-link, .nav-quote-button').forEach(link => {
     link.addEventListener('click', () => {
         navMenu.classList.remove('active');
         hamburger.classList.remove('active');
@@ -16,12 +16,19 @@ document.querySelectorAll('.nav-link').forEach(link => {
 });
 
 // Smooth scrolling for navigation links
+// Improved smooth scrolling with accurate offset calculation
+// Smooth scrolling for navigation links with separate desktop/mobile offsets
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href'));
         if (target) {
-            const offsetTop = target.offsetTop - 70; // Account for fixed navbar
+            // Check if mobile device
+            const isMobile = window.innerWidth <= 768;
+            
+            // Keep your desktop setting (15px), add mobile setting
+            const offsetTop = target.offsetTop - (isMobile ? 80 : 15); // Mobile: 80px, Desktop: 15px (your current setting)
+            
             window.scrollTo({
                 top: offsetTop,
                 behavior: 'smooth'
@@ -75,9 +82,64 @@ function initContactForm() {
     console.log('Contact form initialized');
 }
 
+// Before/After Slider functionality
+function initBeforeAfterSliders() {
+    const sliders = document.querySelectorAll('.before-after-slider');
+    
+    sliders.forEach(slider => {
+        const container = slider.querySelector('.slider-container');
+        const afterImage = slider.querySelector('.after-image');
+        const handle = slider.querySelector('.slider-handle');
+        
+        let isDragging = false;
+        
+        function updateSlider(x) {
+            const rect = container.getBoundingClientRect();
+            const percentage = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
+            
+            afterImage.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+            handle.style.left = `${percentage}%`;
+        }
+        
+        // Mouse events
+        container.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updateSlider(e.clientX);
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updateSlider(e.clientX);
+            }
+        });
+        
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+        
+        // Touch events for mobile
+        container.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            updateSlider(e.touches[0].clientX);
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                e.preventDefault();
+                updateSlider(e.touches[0].clientX);
+            }
+        });
+        
+        document.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+    });
+}
+
 // Initialize all functionality
 document.addEventListener('DOMContentLoaded', () => {
     initContactForm();
+    initBeforeAfterSliders();
     
     // Add click-to-call functionality
     document.querySelectorAll('a[href^="tel:"]').forEach(link => {
@@ -123,3 +185,82 @@ document.addEventListener('keydown', function(event) {
         closeModal();
     }
 });
+
+// Enhanced About Us Carousel Functionality
+const slides = document.querySelectorAll('.carousel-slide');
+const indicators = document.querySelectorAll('.indicator');
+const prevBtn = document.querySelector('.prev-btn');
+const nextBtn = document.querySelector('.next-btn');
+let currentSlide = 0;
+let autoSlideInterval;
+
+function showSlide(index) {
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+    });
+    indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('active', i === index);
+    });
+}
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+}
+
+function prevSlide() {
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+}
+
+function startAutoSlide() {
+    autoSlideInterval = setInterval(nextSlide, 4000);
+}
+
+function stopAutoSlide() {
+    clearInterval(autoSlideInterval);
+}
+
+// Event listeners
+indicators.forEach((indicator, index) => {
+    indicator.addEventListener('click', () => {
+        currentSlide = index;
+        showSlide(currentSlide);
+        stopAutoSlide();
+        setTimeout(startAutoSlide, 3000);
+    });
+});
+
+if (prevBtn && nextBtn) {
+    prevBtn.addEventListener('click', () => {
+        prevSlide();
+        stopAutoSlide();
+        setTimeout(startAutoSlide, 3000);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        nextSlide();
+        stopAutoSlide();
+        setTimeout(startAutoSlide, 3000);
+    });
+}
+
+// Pause on hover
+const carouselContainer = document.querySelector('.carousel-container');
+if (carouselContainer) {
+    carouselContainer.addEventListener('mouseenter', stopAutoSlide);
+    carouselContainer.addEventListener('mouseleave', startAutoSlide);
+}
+
+// Start auto-slide
+startAutoSlide();
+
+// CTA button functionality
+const aboutCtaBtn = document.querySelector('.about-cta-btn');
+if (aboutCtaBtn) {
+    aboutCtaBtn.addEventListener('click', () => {
+        document.querySelector('#contact').scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+}
