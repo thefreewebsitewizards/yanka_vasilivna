@@ -2321,7 +2321,7 @@ body {
     .contact-item {
         padding: 1.2rem; 
         gap: 1rem; 
-        max-width: 85%;
+        max-width: 100%;
     }
     
     .contact-icon {
@@ -2364,7 +2364,7 @@ body {
     }
     
     .quote-form {
-        max-width: 85%;
+        max-width: 100%;
     }
     
     .quote-form-container {
@@ -2504,7 +2504,7 @@ body {
     
     .contact-cta {
         padding: 1.5rem;
-        max-width: 85%;
+        max-width: 100%;
     }
     
     .quote-form-container {
