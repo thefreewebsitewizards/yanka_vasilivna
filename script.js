@@ -264,3 +264,23 @@ if (aboutCtaBtn) {
         });
     });
 }
+
+// Video functionality
+function playVideo() {
+    const video = document.getElementById('cleaningVideo');
+    const overlay = document.getElementById('videoOverlay');
+    
+    if (video && overlay) {
+        video.play();
+        overlay.classList.add('hidden');
+        
+        // Show overlay again when video ends or is paused
+        video.addEventListener('pause', () => {
+            overlay.classList.remove('hidden');
+        });
+        
+        video.addEventListener('ended', () => {
+            overlay.classList.remove('hidden');
+        });
+    }
+}
